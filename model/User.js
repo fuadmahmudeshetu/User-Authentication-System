@@ -1,3 +1,5 @@
+const { getRounds } = require('bcrypt');
+const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
 
 UserSchema = new mongoose.Schema({
@@ -23,6 +25,25 @@ UserSchema = new mongoose.Schema({
         required: [true, "Please provide password"],
         minlength: 6
     }
-})
+});
+
+UserSchema.pre('save', async function (next) {
+
+    if (!this.isModified('password')) return next();
+
+    try {
+
+        const salt = await bcrypt.genSalt(saltRounds);
+
+        this.password = await bcrypt.hash(this.password, salt);
+
+        next();
+
+    } catch (err) {
+
+        next(err);
+
+    }
+});
 
 module.exports = mongoose.model('User', UserSchema)
