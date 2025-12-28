@@ -1,6 +1,7 @@
 const { getRounds } = require('bcrypt');
 const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
 
 UserSchema = new mongoose.Schema({
     name: {
@@ -26,6 +27,19 @@ UserSchema = new mongoose.Schema({
         minlength: 6
     }
 });
+
+UserSchema.methods.createToken = function() {
+    const payLoad = {
+        userId: this._id,
+        name: this.name
+    };
+
+    const secret_key = process.env.JWT_SECRET;
+
+    return jwt.sign(payLoad, secret_key, {
+        expiresIn: '30d'
+    })
+}
 
 UserSchema.pre('save', async function () {
     const salt = await bcrypt.genSalt(10)
