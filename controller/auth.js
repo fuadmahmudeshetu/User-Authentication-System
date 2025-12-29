@@ -6,10 +6,9 @@ const register = async (req, res) => {
     const token = user.createToken();
 
     res.status(201).json({
-        user: { name: user.name},
+        user: { name: user.name },
         token
     })
-
 }
 
 const login = async (req, res) => {
@@ -31,7 +30,9 @@ const login = async (req, res) => {
         return res.status(401).json({ message: 'Invalid email or password' })
     }
 
-    res.status(200).json({ message: 'Login Successful' })
+    const token = await user.createToken();
+
+    res.status(200).json({ user: { name: user.name }, token })
 }
 
 
